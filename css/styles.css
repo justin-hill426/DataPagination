@@ -24,8 +24,6 @@ ul {
   width: 95%;
 }
 
-
-
 header {
   text-align: center;
 	display: flex;
@@ -202,13 +200,13 @@ header h2 {
 	.page {
 		width: 70%;
 	}
-	
+
 	header {
 		flex-flow: row;
 		align-items: center;
 		padding: 3em 0;
 	}
-	
+
 	header h2 {
     margin-right: auto;
 		margin-bottom: 0;
