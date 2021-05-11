@@ -8,7 +8,7 @@ const STUDENTS_PER_PAGE = 9;
 
 
 /*
-Extra Credit
+Creates a dynamic searchbar using the insertAdjacentHTML() function in JS.
 */
 function createSearchBar() {
   const studentsH2 = document.querySelector('header h2');
@@ -23,6 +23,9 @@ function createSearchBar() {
    studentsH2.insertAdjacentHTML('afterend',searchBarHTML);
 }
 
+/*
+Takes in an input query and then constucts a new list of potential matches
+*/
 function addSearchFunctionality(searchInput, list) {
   let searchList = [];
   for(let i = 0; i < list.length; i++) {
@@ -31,13 +34,20 @@ function addSearchFunctionality(searchInput, list) {
       searchList.push(list[i]);
     }
   }
+  /*
+  It made more sense to me if the query is "" to show all results so I changed it back
+  comment out these lines of code if you prefer no results with a blank search query
+  */
   if(searchInput.length == 0) {
     showPage(data, 1);
+    addPagination(data);
   }
   else {
     showPage(searchList, 1);
     addPagination(searchList);
+
   }
+
 
 }
 
@@ -46,16 +56,15 @@ function addSearchFunctionality(searchInput, list) {
 Create the `showPage` function
 This function will create and insert/append the elements needed to display a "page" of nine students
 */
-
 function showPage(list, page) {
   //two variables to track the indices of the students being shown
-
   const startIndex = (page * STUDENTS_PER_PAGE) - STUDENTS_PER_PAGE;
   const endIndex = page * STUDENTS_PER_PAGE;
 
   const studentList = document.querySelector('.student-list');
   studentList.innerHTML = "";
 
+  //function to create elements given tag and class names to simplify code
   const createElement = (tagName, className, content = "") => {
     const element = document.createElement(tagName);
     element.className = className;
@@ -69,25 +78,38 @@ function showPage(list, page) {
     return element;
   };
 
-  for(let i = startIndex; i < endIndex; i++) {
-    if(list[i]) {
-      const li = createElement('li', 'student-item cf');
-      const studentInfoDiv = createElement('div', 'student-details');
-      const img = createElement('img', 'avatar', list[i].picture.large);
-      let studentName = list[i].name.first + " " + list[i].name.last;
-      const h3 = createElement('h3', '', studentName);
-      const emailSpan = createElement('span', 'email', list[i].email);
-      studentInfoDiv.appendChild(img);
-      studentInfoDiv.appendChild(h3);
-      studentInfoDiv.appendChild(emailSpan);
-      const joinedDiv = createElement('div', 'joined-details');
-      const joinedSpan = createElement('span', 'date', "Joined " + list[i].registered.date);
-      joinedDiv.appendChild(joinedSpan)
-      li.appendChild(studentInfoDiv);
-      li.appendChild(joinedDiv);
-      studentList.appendChild(li);
-    }
+  if(list.length === 0) {
+    studentList.innerHTML =
+    `
+      <p>
+      Your search generated no results. Please Try Again.
+
+      </p>
+    `;
   }
+  else {
+    //creates elements on the page while the position in the list actually exists (is not undefined)
+      for(let i = startIndex; i < endIndex; i++) {
+        if(list[i]) {
+          const li = createElement('li', 'student-item cf');
+          const studentInfoDiv = createElement('div', 'student-details');
+          const img = createElement('img', 'avatar', list[i].picture.large);
+          let studentName = list[i].name.first + " " + list[i].name.last;
+          const h3 = createElement('h3', '', studentName);
+          const emailSpan = createElement('span', 'email', list[i].email);
+          studentInfoDiv.appendChild(img);
+          studentInfoDiv.appendChild(h3);
+          studentInfoDiv.appendChild(emailSpan);
+          const joinedDiv = createElement('div', 'joined-details');
+          const joinedSpan = createElement('span', 'date', "Joined " + list[i].registered.date);
+          joinedDiv.appendChild(joinedSpan)
+          li.appendChild(studentInfoDiv);
+          li.appendChild(joinedDiv);
+          studentList.appendChild(li);
+        }
+      }
+  }
+
 }
 
 
@@ -95,7 +117,6 @@ function showPage(list, page) {
 Create the `addPagination` function
 This function will create and insert/append the elements needed for the pagination buttons
 */
-
 function addPagination(list) {
   const linkList = document.querySelector('.link-list');
   const numOfPages = Math.ceil(list.length / STUDENTS_PER_PAGE);
@@ -113,6 +134,7 @@ function addPagination(list) {
   if(actButton) {
     actButton.className = 'active';
   }
+  //adds event listener to listen for a change in the list number
   linkList.addEventListener('click', (e) => {
     if(e.target.tagName === 'BUTTON') {
       const activeButton = linkList.querySelector('button.active');
@@ -123,20 +145,20 @@ function addPagination(list) {
   });
 }
 
-
-
 // Call functions
 createSearchBar();
+//define global variables for listeners
 const search = document.querySelector('.student-search');
 const searchSubmit = document.querySelector('label button');
 showPage(data, 1);
 addPagination(data);
-
+//submit listener on the search query (for personal practice although technically redundant with a keyup listener)
 searchSubmit.addEventListener('click', (event) => {
   event.preventDefault();
-  addSearchFunctionality(search.target.value, data);
+  const input = document.querySelector('label input');
+  addSearchFunctionality(input.value, data);
 });
-
+//Keyup listener to listen for keyboard input in the search bar.
 search.addEventListener('keyup', (event) => {
   addSearchFunctionality(event.target.value, data);
 });
